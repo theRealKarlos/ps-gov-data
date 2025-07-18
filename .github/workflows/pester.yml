@@ -1,5 +1,5 @@
-# Minimal GitHub Actions workflow to run Pester tests on every push and pull request
-name: Pester Tests
+# Minimal GitHub Actions workflow to run Pester tests and linting on every push and pull request
+name: Pester & Lint
 
 on:
   push:
@@ -24,5 +24,22 @@ jobs:
         run: |
           Invoke-Pester ./GetGovData.Tests.ps1
 
-# This workflow runs Pester unit tests on every push and pull request using PowerShell 7.x.
-# The build will fail if any test fails, ensuring code quality and test coverage.
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+
+      - name: Run PSScriptAnalyzer (lint all scripts)
+        shell: pwsh
+        run: |
+          $results = Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error
+          if ($results) {
+            $results | Format-Table | Out-String | Write-Host
+            Write-Error "Linting errors found."
+            exit 1
+          } else {
+            Write-Host "No linting errors found."
+          }
+
+# This workflow runs Pester unit tests and PSScriptAnalyzer linting on every push and pull request using PowerShell 7.x.
+# The build will fail if any test or linting error is found, ensuring code quality and test coverage.

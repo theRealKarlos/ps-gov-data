@@ -5,7 +5,7 @@
 Remove-Module GetGovData.Functions -ErrorAction SilentlyContinue
 Import-Module (Join-Path -Path (Split-Path $MyInvocation.MyCommand.Path) -ChildPath 'GetGovData.Functions.psm1') -Force
 # Output exported function names for debugging
-Write-Host "Exported functions in GetGovData.Functions module:"
+Write-Output "Exported functions in GetGovData.Functions module:"
 Get-Command -Module GetGovData.Functions | Select-Object Name
 
 # Using a module and InModuleScope enables reliable mocking and best-practice unit testing with Pester
@@ -55,4 +55,4 @@ InModuleScope GetGovData.Functions {
             $result.result | Should -Be 'ok'
         }
     }
-} 
+}

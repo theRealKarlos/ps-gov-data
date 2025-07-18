@@ -9,6 +9,7 @@ This project is a **lab experiment** in building a robust, production-grade Powe
 - Parallel processing (PowerShell 7+) for speed, with sequential fallback for compatibility
 - Robust error handling, retry logic, and comprehensive logging
 - Unit tests for core logic using Pester
+- **Linting with PSScriptAnalyzer for PowerShell best practices**
 - Modular function design for reusability and testability
 
 ## Project Structure
@@ -44,6 +45,16 @@ Install-Module Pester -Force  # if not already installed
 Invoke-Pester ./GetGovData.Tests.ps1
 ```
 
+### Run Linting (PSScriptAnalyzer)
+
+```powershell
+Install-Module PSScriptAnalyzer -Force -Scope CurrentUser  # if not already installed
+Invoke-ScriptAnalyzer -Path . -Recurse
+```
+
+- The linter checks for PowerShell best practices, including help comments, trailing whitespace, and use of approved verbs.
+- The GitHub Actions workflow will fail if any linting errors are found, ensuring code quality is maintained.
+
 ## Architecture & Best Practices
 
 - **Functions are defined in a separate module** (`GetGovData.Functions.psm1`) for easy testing and reuse.
@@ -52,6 +63,7 @@ Invoke-Pester ./GetGovData.Tests.ps1
 - **Comprehensive logging** to both console and file, including warnings for skipped/invalid datasets.
 - **Exit codes** are set for CI/CD integration: `0` (success), `1` (fatal error), `2` (no valid data).
 - **Unit tests** (Pester) cover core logic and error handling.
+- **Linting** (PSScriptAnalyzer) enforces PowerShell style and best practices.
 
 ## Known Test Limitation (Pester & Module Mocking)
 

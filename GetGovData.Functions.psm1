@@ -17,7 +17,7 @@
 #   - All functions use comment-based help for discoverability.
 #   - All functions are designed for reusability and testability.
 
-<#+
+<#
 .SYNOPSIS
 Retries an HTTP REST request with backoff and logs all attempts.
 .DESCRIPTION
@@ -62,7 +62,7 @@ function Invoke-RestMethodWithRetry {
     return $null
 }
 
-<#+
+<#
 .SYNOPSIS
 Converts a raw metadata object from the API into a validated, flattened PowerShell object for CSV export.
 .DESCRIPTION
@@ -108,7 +108,7 @@ function ConvertTo-MetadataObject {
     return $metadataObject
 }
 
-<#+
+<#
 .SYNOPSIS
 Processes a single dataset ID: fetches metadata, validates, and logs.
 .DESCRIPTION
@@ -140,4 +140,4 @@ function Invoke-DatasetProcessing {
     }
 }
 
-Export-ModuleMember -Function Invoke-RestMethodWithRetry, ConvertTo-MetadataObject, Invoke-DatasetProcessing 
+Export-ModuleMember -Function Invoke-RestMethodWithRetry, ConvertTo-MetadataObject, Invoke-DatasetProcessing
