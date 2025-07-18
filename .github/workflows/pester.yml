@@ -22,7 +22,7 @@ jobs:
       - name: Run Pester tests
         shell: pwsh
         run: |
-          Invoke-Pester ./GetGovData.Tests.ps1 -EnableExit
+          Invoke-Pester ./GetGovData.Tests.ps1
 
 # This workflow runs Pester unit tests on every push and pull request using PowerShell 7.x.
 # The build will fail if any test fails, ensuring code quality and test coverage.
