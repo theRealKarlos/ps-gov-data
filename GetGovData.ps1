@@ -13,7 +13,7 @@ catch {
 
 # ---- Test Mode ----
 # Uncomment the following line to limit dataset retrieval to only a few datasets for testing
-#$datasetIDs = $datasetIDs[0..20]
+$datasetIDs = $datasetIDs[0..9]
 
 # Set up CSV output
 $csvFile = "DataGovUK_Datasets.csv"
