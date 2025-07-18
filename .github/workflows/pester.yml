@@ -1,0 +1,28 @@
+# Minimal GitHub Actions workflow to run Pester tests on every push and pull request
+name: Pester Tests
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: |
+          Install-Module Pester -Force -Scope CurrentUser
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          Invoke-Pester ./GetGovData.Tests.ps1 -EnableExit
+
+# This workflow runs Pester unit tests on every push and pull request using PowerShell 7.x.
+# The build will fail if any test fails, ensuring code quality and test coverage.
