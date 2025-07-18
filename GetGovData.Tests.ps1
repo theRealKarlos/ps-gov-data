@@ -24,14 +24,14 @@ InModuleScope GetGovData.Functions {
         }
         It "Returns object for valid metadata" {
             $meta = [PSCustomObject]@{
-                id = 'foo'
-                title = 'Test'
-                notes = 'desc'
-                license_title = 'Open'
-                organization = [PSCustomObject]@{ title = 'Org' }
-                metadata_created = '2020-01-01'
+                id                = 'foo'
+                title             = 'Test'
+                notes             = 'desc'
+                license_title     = 'Open'
+                organization      = [PSCustomObject]@{ title = 'Org' }
+                metadata_created  = '2020-01-01'
                 metadata_modified = '2020-01-02'
-                resources = @(@{ url = 'http://example.com'; format = 'CSV' })
+                resources         = @(@{ url = 'http://example.com'; format = 'CSV' })
             }
             $result = ConvertTo-MetadataObject $meta
             $result | Should -Not -Be $null
@@ -52,7 +52,7 @@ InModuleScope GetGovData.Functions {
         # NOTE: This test is skipped due to a known limitation in Pester 5.x (see README and https://github.com/pester/Pester/issues/1647)
         # Pester cannot mock Invoke-RestMethod inside module scope, so this test will always fail in CI.
         # See the README for more details.
-        It "Returns response on first try" -Skip:"See README: Pester cannot mock Invoke-RestMethod in module scope (Pester #1647)" {
+        It "Returns response on first try (SKIPPED: see README, Pester #1647)" -Skip {
             $logs = @()
             $result = Invoke-RestMethodWithRetry -Uri 'http://ok' -MaxRetries 2 -RetryDelay 0 -Logs ([ref]$logs)
             $result.result | Should -Be 'ok'
