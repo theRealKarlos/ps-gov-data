@@ -110,7 +110,24 @@ if ($MyInvocation.InvocationName -ne '.') {
 
     # --- 10. Export results to CSV if any valid metadata was collected ---
     if ($datasetMetadata.Count -gt 0) {
-        $datasetMetadata | Where-Object { $_ -ne $null } | Export-Csv -Path $csvFile -NoTypeInformation
+        # Find the maximum number of download URLs across all datasets to ensure all columns are included
+        $maxUrls = ($datasetMetadata | ForEach-Object { 
+            ($_.PSObject.Properties | Where-Object { $_.Name -like "Download_URL_*" }).Count 
+            } | Measure-Object -Maximum).Maximum
+        
+        # Ensure all objects have the same number of URL properties for consistent CSV export
+        $normalizedData = $datasetMetadata | Where-Object { $_ -ne $null } | ForEach-Object {
+            $obj = $_
+            for ($i = 1; $i -le $maxUrls; $i++) {
+                $propName = "Download_URL_$i"
+                if (-not ($obj.PSObject.Properties.Name -contains $propName)) {
+                    $obj | Add-Member -MemberType NoteProperty -Name $propName -Value ""
+                }
+            }
+            $obj
+        }
+        
+        $normalizedData | Export-Csv -Path $csvFile -NoTypeInformation
         Write-Output "Dataset metadata saved to $csvFile"
         Write-Output "EXIT CODE: 0 (success)"
         exit 0
