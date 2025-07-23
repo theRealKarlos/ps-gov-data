@@ -24,20 +24,20 @@ if ($MyInvocation.InvocationName -ne '.') {
     }
 
     # --- 3. Fetch dataset list from data.gov.uk ---
-    try {
-        $datasetIDs = (Invoke-RestMethod -Uri $datasetListUrl -TimeoutSec 30).result
-    }
-    catch {
-        $errMsg = "FATAL: Failed to retrieve dataset list: $_"
+    $logs = @()
+    $response = Invoke-RestMethodWithRetry -Uri $datasetListUrl -Logs ([ref]$logs)
+    if ($null -eq $response -or $response.PSObject.Properties.Name -notcontains 'result') {
+        $errMsg = "FATAL: Failed to retrieve dataset list from $datasetListUrl"
         Write-Error $errMsg
         $errMsg | Out-File -Append -FilePath $logFile
         Write-Output "EXIT CODE: 1 (fatal error fetching dataset list)"
         exit 1
     }
+    $datasetIDs = $response.result
 
     # --- 4. Test Mode: Limit to a subset of datasets for testing ---
     # Uncomment the following line to limit dataset retrieval to only a few datasets for testing
-    $datasetIDs = $datasetIDs[0..9]
+    $datasetIDs = $datasetIDs[0..20]
 
     # --- 5. Prepare thread-safe collections for results and logs ---
     $datasetMetadata = [System.Collections.Concurrent.ConcurrentBag[object]]::new()
@@ -49,7 +49,8 @@ if ($MyInvocation.InvocationName -ne '.') {
     # --- 6. Log whether parallelism or sequential is used ---
     if ($PSVersionTable.PSVersion.Major -ge 7) {
         $parallelModeMsg = "INFO: Using parallel processing (PowerShell $($PSVersionTable.PSVersion))"
-    } else {
+    }
+    else {
         $parallelModeMsg = "INFO: Using sequential processing (PowerShell $($PSVersionTable.PSVersion))"
     }
     Write-Output $parallelModeMsg
@@ -71,7 +72,8 @@ if ($MyInvocation.InvocationName -ne '.') {
                     $localLogs += "WARNING: Skipped dataset $datasetID due to missing or malformed required fields at $(Get-Date)"
                 }
                 return @{ Metadata = $metadataObject; Logs = $localLogs }
-            } else {
+            }
+            else {
                 $localLogs += "WARNING: Skipped dataset $datasetID due to null or malformed API response at $(Get-Date)"
                 return @{ Metadata = $null; Logs = $localLogs }
             }
@@ -85,7 +87,8 @@ if ($MyInvocation.InvocationName -ne '.') {
                 $logEntries.Add($log)
             }
         }
-    } else {
+    }
+    else {
         # --- 7c. Sequential fallback for PowerShell <7 ---
         foreach ($datasetID in $datasetIDs) {
             $result = Invoke-DatasetProcessing -datasetID $datasetID -datasetMetadataUrl $datasetMetadataUrl
@@ -111,7 +114,8 @@ if ($MyInvocation.InvocationName -ne '.') {
         Write-Output "Dataset metadata saved to $csvFile"
         Write-Output "EXIT CODE: 0 (success)"
         exit 0
-    } else {
+    }
+    else {
         $errMsg = "No valid dataset metadata found, skipping CSV export."
         Write-Output $errMsg
         $errMsg | Out-File -Append -FilePath $logFile
